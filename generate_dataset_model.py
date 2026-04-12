@@ -37,4 +37,4 @@ model = RandomForestClassifier(n_estimators=100, random_state=42)
 model.fit(X, y)
 
 joblib.dump(model, "fraud_model.pkl")
-print("✅ Model saved as fraud_model.pkl")
+print("✅ Model saved as UPI_fraud_model.pkl")
