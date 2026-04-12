@@ -42,7 +42,7 @@ REVIEW_CSV = os.path.join(RECORDS_DIR, "review_transactions.csv")
 def safe_load_model(path):
     """Attempt to load a joblib model. Return None if unavailable or on error."""
     if not os.path.exists(path):
-        print(f"Model file not found: {path}")
+        print(f"Model file  is not found: {path}")
         return None
     try:
         return joblib.load(path)
