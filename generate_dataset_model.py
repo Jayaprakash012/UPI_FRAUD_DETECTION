@@ -26,7 +26,7 @@ data = {
 
 df = pd.DataFrame(data)
 df.to_csv("upi_demo_dataset.csv", index=False)
-print("✅ Dataset with Sender/Receiver saved!")
+print("✅ Dataset with Sender or Receiver saved!")
 
 # ML Training (same as before)
 df_encoded = pd.get_dummies(df.drop(columns=["TransactionID", "Date", "Sender", "Receiver", "FraudLabel"]))
