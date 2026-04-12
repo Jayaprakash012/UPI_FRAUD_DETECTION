@@ -1,0 +1,112 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f8f9fa;
+  padding: 20px;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+input, select {
+  margin: 10px;
+  padding: 5px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+th {
+  background: #007bff;
+  color: white;
+}
+
+/* ✅ Risk level colors */
+tr.fraud {
+  background: #ffcccc; /* High Risk - Red */
+}
+
+tr.medium {
+  background: #ffe6b3; /* Medium Risk - Orange */
+}
+
+tr.low {
+  background: #ccffcc; /* Low Risk - Green */
+}
+body {
+  font-family: Arial, sans-serif;
+  background: #f8f9fa;
+  padding: 20px;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+input, select {
+  margin: 10px;
+  padding: 5px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+th {
+  background: #007bff;
+  color: white;
+}
+
+/* ✅ Risk level colors */
+tr.fraud {
+  background: #ffcccc; /* High Risk - Red */
+}
+
+tr.medium {
+  background: #ffe6b3; /* Medium Risk - Orange */
+}
+
+tr.low {
+  background: #ccffcc; /* Low Risk - Green */
+}
+
+.charts-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.chart-box {
+    width: 48%; /* Adjust as needed */
+    margin: 10px 0;
+}
+
+@media (max-width: 768px) {
+    .chart-box {
+        width: 100%;
+    }
+}

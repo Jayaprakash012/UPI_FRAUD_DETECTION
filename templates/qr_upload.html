@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>QR Code Fraud Detection</title>
+
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            background:#f4f6f8;
+        }
+        .container{
+            width:900px;
+            margin:40px auto;
+            background:white;
+            padding:25px 30px 35px;
+            border-radius:15px;
+            box-shadow:0 4px 10px rgba(0,0,0,0.08);
+        }
+        h1{
+            color:#0078d4;
+            margin-top:0;
+        }
+        .info-box{
+            background:#f9f9f9;
+            border-left:5px solid #0078d4;
+            padding:10px 14px;
+            margin-bottom:18px;
+            font-size:14px;
+        }
+        .upload-box{
+            padding:18px;
+            border:2px dashed #0078d4;
+            background:#f8fbff;
+            border-radius:10px;
+        }
+        button{
+            background:#0078d4;
+            color:white;
+            border:none;
+            padding:9px 18px;
+            border-radius:6px;
+            cursor:pointer;
+            font-size:14px;
+        }
+        button:hover{
+            background:#0060aa;
+        }
+        .result{
+            margin-top:20px;
+            padding:15px;
+            background:#eef6ff;
+            border-radius:8px;
+            display:none;
+            font-size:14px;
+        }
+        .success{color:green;font-weight:bold;}
+        .error{color:red;font-weight:bold;}
+
+        #analysisPanel{
+            margin-top:26px;
+        }
+        #analysisPanel h2{
+            margin:0 0 16px 0;
+        }
+        .ta-top{
+            display:grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap:16px;
+            margin-bottom:22px;
+        }
+        .ta-card{
+            background:#fff;
+            border-radius:12px;
+            padding:14px 16px;
+            box-shadow:0 1px 4px rgba(0,0,0,0.06);
+            border:1px solid #e5e7eb;
+        }
+        .ta-label{
+            font-size:12px;
+            color:#6b7280;
+            margin-bottom:4px;
+        }
+        .ta-value{
+            font-size:18px;
+            font-weight:600;
+            color:#111827;
+            word-break:break-all;
+        }
+        .ta-middle{
+            display:grid;
+            grid-template-columns: 1.1fr 1.1fr;
+            gap:24px;
+        }
+        .ta-box{
+            background:#fff;
+            border-radius:14px;
+            padding:18px 18px 22px;
+            box-shadow:0 1px 4px rgba(0,0,0,0.06);
+            border:1px solid #e5e7eb;
+        }
+        .ta-box h3{
+            margin:0 0 8px 0;
+            font-size:16px;
+        }
+
+        .risk-circle{
+            width:150px;
+            height:150px;
+            border-radius:50%;
+            border:10px solid #e5e7eb;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            margin-top:10px;
+        }
+        .risk-inner{
+            width:100px;
+            height:100px;
+            border-radius:50%;
+            background:#f9fafb;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:26px;
+            font-weight:600;
+            color:#111827;
+        }
+        .risk-label{
+            margin-top:10px;
+            font-size:14px;
+            font-weight:600;
+            padding:4px 10px;
+            border-radius:999px;
+            display:inline-block;
+        }
+        .risk-low{background:#ecfdf3;color:#0f766e;}
+        .risk-medium{background:#fef3c7;color:#b45309;}
+        .risk-high{background:#fee2e2;color:#b91c1c;}
+
+        /* Fraud rules panel */
+        #rulesPanel{
+            margin-top:28px;
+        }
+        #rulesPanel h2{
+            margin-bottom:14px;
+        }
+        #rulesList{
+            display:flex;
+            flex-direction:column;
+            gap:12px;
+        }
+        .rule-card{
+            display:flex;
+            align-items:flex-start;
+            gap:12px;
+            background:#fff;
+            border-radius:14px;
+            padding:12px 16px;
+            border:1px solid #e5e7eb;
+            box-shadow:0 1px 3px rgba(0,0,0,0.03);
+        }
+        .rule-icon{
+            width:28px;
+            height:28px;
+            border-radius:999px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:16px;
+            font-weight:700;
+            flex-shrink:0;
+        }
+        .rule-ok .rule-icon{
+            background:#ecfdf3;
+            color:#16a34a;
+        }
+        .rule-bad .rule-icon{
+            background:#fef3c7;
+            color:#b45309;
+        }
+        .rule-title{
+            font-size:15px;
+            font-weight:600;
+            color:#111827;
+            margin-bottom:2px;
+        }
+        .rule-desc{
+            font-size:13px;
+            color:#6b7280;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>QR Code Fraud Detection</h1>
+
+    <div class="info-box">
+        <p>{{ dataset_status }}</p>
+        <p><b>Total Records:</b> {{ dataset_rows }}</p>
+        <p>{{ model_status }}</p>
+        <p><b>Model Accuracy:</b> {{ model_accuracy }}%</p>
+    </div>
+
+    <div class="upload-box">
+        <h3>📸 Upload QR Image</h3>
+        <form id="uploadForm">
+            <input type="file" id="qrFile" required>
+            <br><br>
+            <button type="submit">Analyze QR</button>
+        </form>
+    </div>
+
+    <div class="result" id="resultBox"></div>
+
+    <!-- Transaction Analysis Panel -->
+    <div id="analysisPanel" style="display:none;">
+
+        <h2>Transaction Analysis</h2>
+
+        <div class="ta-top">
+            <div class="ta-card">
+                <div class="ta-label">Total Amount to Merchant</div>
+                <div class="ta-value" id="taAmount">–</div>
+            </div>
+            <div class="ta-card">
+                <div class="ta-label">Payee (Merchant)</div>
+                <div class="ta-value" id="taPayee">–</div>
+            </div>
+            <div class="ta-card">
+                <div class="ta-label">VPA (Merchant UPI)</div>
+                <div class="ta-value" id="taVpa">–</div>
+            </div>
+            <div class="ta-card">
+                <div class="ta-label">Location</div>
+                <div class="ta-value" id="taLocation">–</div>
+            </div>
+        </div>
+
+        <div class="ta-middle">
+            <div class="ta-box">
+                <h3>Fraud Risk Score</h3>
+                <div class="risk-circle">
+                    <div class="risk-inner">
+                        <span id="riskScoreValue">0</span>
+                    </div>
+                </div>
+                <div id="riskScoreLabel" class="risk-label risk-low">Low Risk</div>
+            </div>
+
+            <div class="ta-box">
+                <h3>Risk Distribution</h3>
+                <canvas id="riskPie" width="260" height="260"></canvas>
+            </div>
+        </div>
+
+        <!-- Behavior Profile Panel -->
+        <div id="behaviorPanel" style="margin-top:28px; display:none;">
+            <div class="ta-box" style="width:100%;">
+                <h3>Behavior Profile Analysis</h3>
+                <canvas id="behaviorRadar" width="420" height="260"></canvas>
+                <div style="margin-top:8px;font-size:12px;">
+                    <span style="color:rgba(37,99,235,1);font-weight:600;">■ Current Behavior</span>
+                    <span style="margin-left:12px;color:rgba(16,185,129,1);font-weight:600;">■ Baseline Behavior</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fraud Detection Rules Panel -->
+        <div id="rulesPanel" style="display:none;">
+            <h2>Fraud Detection Rules</h2>
+            <div id="rulesList"></div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+const form = document.getElementById("uploadForm");
+const resultBox = document.getElementById("resultBox");
+const analysisPanel = document.getElementById("analysisPanel");
+let riskPieChart = null;
+let behaviorChart = null;
+
+function cleanQrText(raw) {
+    if (!raw) return "";
+    const EXCLUDE = ["TRANSACTION_ID","CUSTOMER","PHONE","AMOUNT","STATUS","FRAUD"];
+    let lines = raw.replace(/<br\s*\/?>/gi,"\n").split(/\r?\n/).map(l=>l.trim()).filter(l=>l);
+    lines = lines.filter(line => !EXCLUDE.includes(line.split(":",1)[0].trim().toUpperCase()));
+    return lines.join("<br>");
+}
+
+// Build rule objects based on attributes + behavior + risk
+function evaluateRules(a, bh, fraudFlag, riskScore){
+    const rules = [];
+    const totalAmount = Number(a.amount || 0);
+
+    // 1) High Value Transaction (total amount exposure to merchant)
+    if (totalAmount === 0 || isNaN(totalAmount)){
+        rules.push({
+            ok: true,
+            title: "High Value Transaction",
+            desc: "No significant transaction history available."
+        });
+    } else if (totalAmount <= 20000){
+        rules.push({
+            ok: true,
+            title: "High Value Transaction",
+            desc: `Amount ₹${totalAmount.toLocaleString("en-IN")} within normal range`
+        });
+    } else if (totalAmount <= 50000){
+        rules.push({
+            ok: true,
+            title: "High Value Transaction",
+            desc: `Amount ₹${totalAmount.toLocaleString("en-IN")} moderately high but acceptable`
+        });
+    } else {
+        rules.push({
+            ok: false,
+            title: "High Value Transaction",
+            desc: `Amount ₹${totalAmount.toLocaleString("en-IN")} is high, monitor closely`
+        });
+    }
+
+    const current = bh && Array.isArray(bh.current) ? bh.current : [];
+    const trustScore    = current.length >= 4 ? current[3] : 50;  // Merchant Trust axis
+    const timeScore     = current.length >= 2 ? current[1] : 50;  // Time Frequency
+    const locationScore = current.length >= 3 ? current[2] : 50;  // Location Consistency
+
+    // helper: is merchant known in system (has non-neutral behavior)
+    const hasHistory = current.some(v => v !== 50);
+
+    // 2) Merchant Reputation
+    if (trustScore >= 65){
+        rules.push({
+            ok: true,
+            title: "Merchant Reputation",
+            desc: "Known payment provider with low fraud history"
+        });
+    } else if (trustScore >= 50){
+        rules.push({
+            ok: true,
+            title: "Merchant Reputation",
+            desc: "Merchant reputation is acceptable"
+        });
+    } else {
+        rules.push({
+            ok: false,
+            title: "Merchant Reputation",
+            desc: "Merchant shows elevated fraud risk compared to others"
+        });
+    }
+
+    // 3) Unusual Time
+    if (timeScore >= 60){
+        rules.push({
+            ok: true,
+            title: "Unusual Time",
+            desc: "Transaction during usual hours for this merchant"
+        });
+    } else {
+        rules.push({
+            ok: false,
+            title: "Unusual Time",
+            desc: "Transaction at an unusual time compared to past activity"
+        });
+    }
+
+    // 4) Location Consistency
+    if (locationScore >= 70){
+        rules.push({
+            ok: true,
+            title: "Location Consistency",
+            desc: "Transaction in usual merchant location"
+        });
+    } else if (locationScore >= 50){
+        rules.push({
+            ok: true,
+            title: "Location Consistency",
+            desc: "Location mostly consistent with history"
+        });
+    } else {
+        rules.push({
+            ok: false,
+            title: "Location Consistency",
+            desc: "Unusual location pattern detected for this merchant"
+        });
+    }
+
+    // 5) Merchant Verification
+    if (hasHistory){
+        rules.push({
+            ok: true,
+            title: "Merchant Verification",
+            desc: "Valid merchant record found in system"
+        });
+    } else {
+        rules.push({
+            ok: false,
+            title: "Merchant Verification",
+            desc: "Merchant not present in known dataset; treat with caution"
+        });
+    }
+
+    return rules;
+}
+
+function renderRules(rules){
+    const panel = document.getElementById("rulesPanel");
+    const list  = document.getElementById("rulesList");
+    if (!panel || !list) return;
+
+    if (!rules || !rules.length){
+        panel.style.display = "none";
+        return;
+    }
+
+    list.innerHTML = rules.map(r => `
+        <div class="rule-card ${r.ok ? 'rule-ok' : 'rule-bad'}">
+            <div class="rule-icon">${r.ok ? "✓" : "!"}</div>
+            <div>
+                <div class="rule-title">${r.title}</div>
+                <div class="rule-desc">${r.desc}</div>
+            </div>
+        </div>
+    `).join("");
+
+    panel.style.display = "block";
+}
+
+form.addEventListener("submit", async function(e){
+    e.preventDefault();
+
+    const file = document.getElementById("qrFile").files[0];
+    if (!file){
+        alert("Select QR Image First!");
+        return;
+    }
+
+    const fd = new FormData();
+    fd.append("file", file);
+
+    resultBox.style.display="block";
+    resultBox.innerHTML="<p>⏳ Scanning QR...</p>";
+    analysisPanel.style.display="none";
+
+    try{
+        const res = await fetch("/upload_qr",{method:"POST",body:fd});
+        const data = await res.json();
+        if (data.error){
+            resultBox.innerHTML=`<p class="error">❌ ${data.error}</p>`;
+            return;
+        }
+
+        const qrText = cleanQrText(data.qr_data || "");
+        resultBox.innerHTML = `
+            <p class="success">✅ QR VALIDATED</p>
+            <p><b>FRAUD:</b> ${data.fraud}</p>
+            <p><b>QR DATA:</b><br>${qrText}</p>
+        `;
+
+        const a = data.attributes || {};
+        document.getElementById("taAmount").textContent =
+            a.amount!=null ? "₹" + Number(a.amount).toLocaleString("en-IN") : "–";
+        document.getElementById("taPayee").textContent    = a.payee || a.merchant || "–";
+        document.getElementById("taVpa").textContent      = a.vpa || a.payee_vpa || "–";
+        document.getElementById("taLocation").textContent = a.location || "–";
+
+        let riskScore = 0;
+        const fraudFlag = (data.fraud || "").toString().toLowerCase();
+        const amountVal = Number(a.amount || 0);
+
+        if (fraudFlag === "yes" || fraudFlag==="1" || fraudFlag==="fraud"){
+            riskScore = 90;
+        } else {
+            if (amountVal > 100000) riskScore += 50;
+            else if (amountVal > 50000) riskScore += 35;
+            else if (amountVal > 20000) riskScore += 20;
+        }
+
+        riskScore = Math.max(0, Math.min(100, Math.round(riskScore)));
+
+        const scoreEl = document.getElementById("riskScoreValue");
+        const labelEl = document.getElementById("riskScoreLabel");
+        scoreEl.textContent = riskScore;
+
+        labelEl.classList.remove("risk-low","risk-medium","risk-high");
+        if (riskScore <= 30){
+            labelEl.textContent="Low Risk";
+            labelEl.classList.add("risk-low");
+        } else if (riskScore <= 70){
+            labelEl.textContent="Medium Risk";
+            labelEl.classList.add("risk-medium");
+        } else {
+            labelEl.textContent="High Risk";
+            labelEl.classList.add("risk-high");
+        }
+
+        let low = Math.max(0, 100-riskScore-20);
+        let medium = 20;
+        let high = riskScore;
+
+        const ctx = document.getElementById("riskPie").getContext("2d");
+        if (riskPieChart) riskPieChart.destroy();
+        riskPieChart = new Chart(ctx,{
+            type:"pie",
+            data:{
+                labels:["Low","Medium","High"],
+                datasets:[{data:[low,medium,high]}]
+            },
+            options:{
+                plugins:{ legend:{ position:"bottom" } }
+            }
+        });
+
+        /** Behavior Radar **/
+        const behaviorPanel = document.getElementById("behaviorPanel");
+        if (behaviorPanel && data.behavior && data.behavior.labels){
+            const bh = data.behavior;
+            const ctx2 = document.getElementById("behaviorRadar").getContext("2d");
+            if (behaviorChart) behaviorChart.destroy();
+            behaviorChart = new Chart(ctx2,{
+                type:"radar",
+                data:{
+                    labels: bh.labels,
+                    datasets:[
+                        {
+                            label:"Current Behavior",
+                            data: bh.current || [],
+                            fill:true,
+                            borderWidth:2,
+                            backgroundColor: "rgba(37,99,235,0.35)",
+                            borderColor: "rgba(37,99,235,1)",
+                            pointBackgroundColor: "rgba(37,99,235,1)"
+                        },
+                        {
+                            label:"Baseline Behavior",
+                            data: bh.baseline || [],
+                            fill:false,
+                            borderWidth:2,
+                            borderDash:[5,4],
+                            borderColor: "rgba(16,185,129,1)",
+                            pointBackgroundColor: "rgba(16,185,129,1)",
+                            pointRadius:3
+                        }
+                    ]
+                },
+                options:{
+                    responsive:true,
+                    scales:{
+                        r:{
+                            suggestedMin:0,
+                            suggestedMax:100,
+                            ticks:{ stepSize:25 }
+                        }
+                    },
+                    plugins:{
+                        legend:{ display:false }
+                    }
+                }
+            });
+            behaviorPanel.style.display="block";
+        } else {
+            behaviorPanel.style.display="none";
+        }
+
+        // Fraud rules: build and render
+        const rules = evaluateRules(a, data.behavior, fraudFlag, riskScore);
+        renderRules(rules);
+
+        analysisPanel.style.display="block";
+
+    } catch(err){
+        resultBox.innerHTML=`<p class="error">❌ ${err}</p>`;
+        analysisPanel.style.display="none";
+    }
+});
+</script>
+
+</body>
+</html>

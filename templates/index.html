@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>UPI Fraud Detection Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <form action="/analysis" method="get">
+  <button type="submit"><b>TransationAnalysis</b></button>
+</form>
+ <form action="/qranalysis" method="get">
+  <button type="submit"><b>QRAnalysis</b></button>
+</form>
+  <h1>Recent Transactions</h1>
+
+  <div class="chart-container">
+    <canvas id="transactionTypeChart"></canvas>
+  </div>
+  
+  <input type="text" id="search" placeholder="Search transactions...">
+  <select id="filter">
+    <option value="All">All Risk Levels</option>
+    <option value="High Risk">High Risk</option>
+    <option value="Low Risk">Low Risk</option>
+  </select>
+
+  <table id="txnTable">
+    <thead>
+      <tr>
+        <th>Transaction ID</th>
+        <th>Date</th>
+        <th>Amount</th>
+        <th>Type</th>
+        <th>Parties</th>
+        <th>Risk Score</th>
+        <th>Status</th>
+        <th>Anomalies</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
