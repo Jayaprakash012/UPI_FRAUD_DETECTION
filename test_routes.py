@@ -1,6 +1,6 @@
 from app import app
 
-routes = ['/', '/analysis', '/qr_upload', '/transaction', '/get_chart_data', '/nonexistent']
+route = ['/', '/analysis', '/qr_upload', '/transaction', '/get_chart_data', '/nonexistent']
 
 with app.test_client() as c:
     for r in routes:
