@@ -8,5 +8,5 @@ with app.test_client() as c:
         print(r, resp.status_code)
         data = resp.get_data(as_text=True)
         print(data[:500])
-        print('---')
+        print('----')
 
