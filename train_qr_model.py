@@ -19,7 +19,7 @@ if not os.path.exists(dataset_path):
     exit()
 
 df = pd.read_csv(dataset_path)
-print(f"✅ Dataset loaded successfully: {dataset_path}")
+print(f"✅ Dataset is  loaded successfully: {dataset_path}")
 print(f"📊 Total Records: {len(df)}")
 
 if df.empty:
