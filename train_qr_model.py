@@ -23,7 +23,7 @@ print(f"✅ Dataset is  loaded successfully: {dataset_path}")
 print(f"📊 Total Records: {len(df)}")
 
 if df.empty:
-    print("⚠️ Dataset is empty. Please check your data generation script is data is generated or not.")
+    print("⚠️ Dataset is empty. Please check your data generation script is data  generated or not.")
     exit()
 
 print(df.head())
