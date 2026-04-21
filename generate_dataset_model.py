@@ -8,7 +8,7 @@ import datetime
 np.random.seed(42)
 n = 2000
 
-names = ["Rajesh Kumar", "Amit Patel", "Neha Sharma", "Ravi Singh", "Anjali Verma", "Suresh Yadav"," Priya Gupta", "Vikram Joshi", "Kavita Reddy", "Manish Tiwari", "Sunita Das", "Rohan Mehta", "Pooja Nair", "Aakash Choudhary", "Sneha Iyer", "Deepak Malhotra", "Anita Sinha", "Karan Kapoor", "Meena Kumari", "Vijay Rao"]
+names = ["Rajesh Kumar", "Amit Patel", "Neha Sharma", "Ravi Singh", "Anjali Verma","Jayaprakash" "Suresh Yadav"," Priya Gupta", "Vikram Joshi", "Kavita Reddy", "Manish Tiwari", "Sunita Das", "Rohan Mehta", "Pooja Nair", "Aakash Choudhary", "Sneha Iyer", "Deepak Malhotra", "Anita Sinha", "Karan Kapoor", "Meena Kumari", "Vijay Rao"]
 Locations = ["Delhi", "Mumbai", "Kolkata", "Bangalore", "Chennai", "Hyderabad","Pune", "Ahmedabad", "Jaipur", "Lucknow", "Kanpur", "Nagpur", "Surat", "Patna", "Indore", "Bhopal", "Coimbatore", "Kochi", "Visakhapatnam", "Vadodara", "Agra", "Nashik", "Meerut", "Vijayawada", "Aurangabad", "Thane", "Madurai", "Jodhpur", "Raipur", "Gwalior"]
 Device = ["Android", "iOS"]
 data = {
